@@ -32,6 +32,7 @@ import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.text.TextUtilsCompat;
 import android.support.v4.view.ViewCompat;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -44,6 +45,8 @@ import android.view.animation.OvershootInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class PinEntryEditText extends EditText {
@@ -214,6 +217,25 @@ public class PinEntryEditText extends EditText {
         getPaint().getTextBounds("|", 0, 1, mTextHeight);
 
         mAnimate = mAnimatedType > -1;
+    }
+
+    public void setMaxLength(int maxLength) {
+        mMaxLength = maxLength;
+        mNumChars = maxLength;
+
+        InputFilter[] existingFilters = getFilters();
+        List<InputFilter> inputFilters = new ArrayList<>();
+
+        for (int i = 0; i < existingFilters.length; i++) {
+            if (!(existingFilters[i] instanceof InputFilter.LengthFilter)) {
+                inputFilters.add(existingFilters[i]);
+            }
+        }
+
+        inputFilters.add(new InputFilter.LengthFilter(maxLength));
+        setFilters(inputFilters.toArray(existingFilters));
+
+        invalidate();
     }
 
     @Override
